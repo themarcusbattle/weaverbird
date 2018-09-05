@@ -1,6 +1,6 @@
 <?php
 
-namespace CampusBreak\Classes;
+namespace Weaverbird\Helpers;
 
 class CPTs {
 
