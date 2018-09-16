@@ -4,8 +4,9 @@ namespace Weaverbird\Helpers;
 
 class CPTs {
 
-    protected $name     = '';
-    protected $settings = [];
+    protected $name        = '';
+    protected $settings    = [];
+    protected $slug_is_int = false;
 
     public function init() {
         add_action( 'init', [ $this, 'register' ] );
@@ -26,6 +27,10 @@ class CPTs {
     public function change_slug_to_ID( int $post_ID ) {
 
         if ( wp_is_post_revision( $post_ID ) ) {
+            return;
+        }
+
+        if ( ! $this->slug_is_int ) {
             return;
         }
 
