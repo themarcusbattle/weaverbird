@@ -6,23 +6,32 @@ class Metaboxes {
 
     protected $metaboxes = [];
 
-    public function init() {
-        add_action( 'add_meta_boxes', [ $this, 'register' ] );
-        add_action( 'wb_metabox_render_text_field', [ $this, 'render_text_field' ] );
+    public function __construct() {
+        $this->hooks();
     }
 
-    public function register() {
+    public function hooks() {
+        add_action( 'add_meta_boxes', [ $this, 'register' ], 10 );
+    }
+
+    public function register( $post_type ) {
 
         foreach ( $this->metaboxes as $metabox ) {
-
+    
             $metabox = wp_parse_args( $metabox, [
                 'id'        => '',
                 'title'     => '',
-                'post_type' => 'post',
+                'post_type' => [ 'post' ],
                 'fields'    => '',
             ] );
+       
+            $post_types = is_array( $metabox['post_type'] ) ? $metabox['post_type'] : [ $metabox['post_type'] ];
 
-            add_meta_box( $metabox['id'], $metabox['title'], [ $this, 'render' ], $metabox['post_type'], 'normal', 'default', $metabox['fields'] );
+            if ( ! in_array( $post_type, $post_types ) ) {
+                continue;
+            }
+
+            add_meta_box( $metabox['id'], $metabox['title'], [ $this, 'render' ], $post_types, 'normal', 'default', $metabox['fields'] );
         }
     }
 
@@ -32,7 +41,7 @@ class Metaboxes {
     public function render( $post, $metabox ) {
 
         $fields = $metabox['args'] ?? [];
-
+        
         ?>
             <table class="form-table">
                 <tbody>
@@ -47,8 +56,13 @@ class Metaboxes {
                                 'value' => get_post_meta( get_the_ID(), $field['name'], true ),
                                 'size'  => 30,
                             ] );
+                            
+                            $render_method = "render_{$field['type']}_field";
 
-                            do_action( "wb_metabox_render_{$field['type']}_field", $field ); 
+                            if ( method_exists( $this, $render_method ) ) {
+                                $this->$render_method( $field );
+                                continue;
+                            }
                         ?>
                     <?php endforeach; ?>
                 </tbody>

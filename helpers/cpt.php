@@ -2,13 +2,19 @@
 
 namespace Weaverbird\Helpers;
 
-class CPTs {
+class CPT {
+
+    private static $instance;
 
     protected $name        = '';
     protected $settings    = [];
     protected $slug_is_int = false;
 
-    public function init() {
+    public function __construct() {
+        $this->hooks();
+    }
+
+    public function hooks() {
         add_action( 'init', [ $this, 'register' ] );
         add_action( 'save_post', [ $this, 'change_slug_to_ID' ] );
         add_action( 'pre_get_posts', [ $this, 'add_post_types_to_main_query' ] );
@@ -63,5 +69,25 @@ class CPTs {
         }
 
         return $query;
+    }
+
+    public function get( $count = 10 ) {
+
+        if ( $count === 'all' ) {
+            $count = '-1';
+        }
+
+        $args = [
+            'post_type'      => $this->name,
+            'posts_per_page' => $count,
+        ];
+
+        $query = new \WP_Query( $args );
+
+        if ( $query->have_posts() ) {
+            return $query->posts;
+        }
+
+        return false;
     }
 }
