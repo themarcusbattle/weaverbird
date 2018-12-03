@@ -2,13 +2,13 @@
 
 namespace Weaverbird\Helpers;
 
-class Taxonomies {
+class Taxonomy {
 
     protected $name     = '';
     protected $objects  = [];
     protected $settings = [];
 
-    public function init() {
+    public function hooks() {
         add_action( 'init', [ $this, 'register' ] );
         add_action( "{$this->name}_add_form_fields", [ $this, 'add_form_fields' ], 10 );
         add_action( "{$this->name}_edit_form_fields", [ $this, 'edit_form_fields' ], 10 );

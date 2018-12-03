@@ -2,7 +2,7 @@
 
 namespace Weaverbird\Helpers;
 
-class Metaboxes {
+class Metabox {
 
     protected $metaboxes = [];
 

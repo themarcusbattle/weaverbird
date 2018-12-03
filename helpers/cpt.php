@@ -4,18 +4,13 @@ namespace Weaverbird\Helpers;
 
 class CPT {
 
-    private static $instance;
-
     protected $name        = '';
     protected $settings    = [];
     protected $slug_is_int = false;
 
-    public function __construct() {
-        $this->hooks();
-    }
-
     public function hooks() {
-        add_action( 'init', [ $this, 'register' ] );
+
+        add_action( 'init', [ $this, 'init_post_type' ] );
         add_action( 'save_post', [ $this, 'change_slug_to_ID' ] );
         add_action( 'pre_get_posts', [ $this, 'add_post_types_to_main_query' ] );
     }
@@ -23,8 +18,8 @@ class CPT {
     /**
      * Register the custom post type.
      */
-    public static function register() {
-        register_post_type( $this->name, $this->settings );
+    public function init_post_type() {
+        $status = register_post_type( $this->name, $this->settings );
     }
 
     /**
