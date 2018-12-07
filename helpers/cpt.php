@@ -7,6 +7,7 @@ class CPT {
     protected $name        = '';
     protected $settings    = [];
     protected $slug_is_int = false;
+    protected $add_to_main_query = false;
 
     public function hooks() {
 
@@ -35,6 +36,10 @@ class CPT {
             return;
         }
 
+	if ( $this->name !== get_post_type() ) {
+	   return;
+	}
+
         // Unhook this function so it doesn't loop infinitely.
 		remove_action( 'save_post', [ $this, 'change_slug_to_ID' ] );
 
@@ -52,6 +57,10 @@ class CPT {
      * Adds the custom post types to the main query.
      */
     public function add_post_types_to_main_query( \WP_Query $query ) {
+	
+	if ( ! $this->add_to_main_query ) {
+		return $query;
+	}
 
         if ( ! is_admin() && $query->is_main_query() && is_home() ) {
 
